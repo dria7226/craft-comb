@@ -1,0 +1,104 @@
+<craft name="comb">
+    <parameter name="handleHoleRadius" default="0.15" type="float"/>
+    <parameter name="handleLength" default="2" type="float"/>
+    <parameter name="handleThicknes" default="0.1" type="float"/>
+    <parameter name="noOfTeeth" default="10" type="int"/>
+    <script type="text/openjscad">
+         function main(params)
+         {
+             //vars
+             var hole_radius = params.handleHoleRadius || 0.2;
+             if(hole_radius <= 0 || hole_radius > 0.9) hole_radius = 0.15; 
+             
+             var handle_length = params.handleLength || 4;
+             if(handle_length < 1.5)handle_length = 2;
+             
+             var smooth_factor = params.handleThickness || 0.2;
+             if(smooth_factor <= 0)smooth_factor = 10;
+             
+             var teeth = params.noOfTeeth || 18;
+             if(teeth <= 0 || teeth > 30) teeth = 18;
+             //------------------
+             
+             teeth++;
+             
+             //create pill shape
+             var c = cylinder({h:0.4}).translate([0,1,0]);
+             c = union(c,cube([handle_length,2,0.4]));
+             c = union(c,cylinder({h:0.4}).translate([handle_length,1,0])).translate([0,-1,0]);
+             
+             //slim down the pill shape
+             var radius = Math.sqrt(Math.pow(handle_length/2,2) +  Math.pow(1/smooth_factor,2)) - 1;     
+             var handle_smoothing = circle({r : radius, fn : 64}).translate([handle_length/2 - radius,
+                                                                             -radius,
+                                                                             0]);
+             handle_smoothing = handle_smoothing.translate([0,
+                                                            1/smooth_factor,
+                                                            0]);
+                  
+             handle_smoothing = union(handle_smoothing,handle_smoothing.mirroredY());
+             
+             handle_smoothing = linear_extrude({height:0.4},handle_smoothing);
+                  
+             c = difference(c, handle_smoothing);
+             c = c.translate([0,0,-0.2]);
+             
+             //make a hole in the handle
+             c = difference(c,cylinder({r:hole_radius}).center(true));
+             
+             //add head base
+             var head_length = handle_length;
+             var head_base = cube([head_length,1,0.4]).center([false,false,true]);
+             
+             {
+                var head_corner = cylinder({h:0.4}).center([false,false,true]);
+                head_corner = difference(head_corner,cube({size:2}).center([true,false,true]).mirroredY());
+                head_corner = head_corner.translate([head_length,0,0]);
+             }
+             head_base = union(head_base,head_corner).translate([handle_length,0,0]);
+             
+             c = union(c,head_base);
+             
+             //add head
+             var scaling = 0.1;
+             var head = polyhedron({points:[[handle_length,0,-0.2],
+                                            [handle_length,0, 0.2],
+                                            [handle_length+head_length + 1,0,-0.2],
+                                            [handle_length+head_length + 1,0, 0.2],
+                                            [handle_length + scaling,-2,-0.2 + scaling],
+                                            [handle_length + scaling,-2, 0.2 - scaling],
+                                            [handle_length+head_length + 1 - scaling,-2,-0.2 + scaling],
+                                            [handle_length+head_length + 1 - scaling,-2, 0.2 - scaling]],
+                                    triangles:[[0,1,4],
+                                               [1,5,4],
+                                               
+                                               [2,6,3],
+                                               [6,7,3],
+                                               
+                                               [1,7,5],
+                                               [7,1,3],
+                                               
+                                               [1,0,2],
+                                               [2,3,1],
+                                               
+                                               [4,5,6],
+                                               [5,7,6],
+                                               
+                                               [4,6,0],
+                                               [2,0,6]]});
+             
+             c = union(c,head);
+             
+             //now cut the head
+             var cutting_length = head_length+1 - scaling*6;
+             
+             var width = cutting_length/teeth;
+             for(var i = 0; i < teeth; i++)
+             {
+                 c = difference(c,head.center(true).rotateY(90).mirroredY().scale([width,1,1]).translate([handle_length + 3*scaling + (i + 1/2)*width,-1,0]));
+             }
+
+             return c;
+         }
+    </script>
+</craft>

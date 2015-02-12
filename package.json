@@ -1,0 +1,23 @@
+{
+  "name": "craft-comb-dragosh",
+  "version": "2.0.0",
+  "description": "Comb.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dria7226/craft-comb"
+  },
+  "keywords": [
+    "craftml",
+    "comb"
+  ],
+  "author": "Dragos Iarovoi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dria7226/craft-comb/issues"
+  },
+  "homepage": "https://github.com/dria7226/craft-comb"
+}
