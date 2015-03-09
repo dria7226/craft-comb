@@ -1,6 +1,6 @@
 <craft name="comb">
     <parameter name="handleHoleRadius" default="0.15" type="float"/>
-    <parameter name="handleLength" default="2" type="float"/>
+    <parameter name="handleLength" default="4" type="float"/>
     <parameter name="handleThicknes" default="0.1" type="float"/>
     <parameter name="noOfTeeth" default="10" type="int"/>
     <script type="text/openjscad">
